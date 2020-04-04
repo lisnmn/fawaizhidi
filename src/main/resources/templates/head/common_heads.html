@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<div th:fragment="myHeadSimple" class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">FWZD</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item"><a href="/login/">登录</a></li>
+            <li class="layui-nav-item"><a href="/signup/">注册</a></li>
+        </ul>
+    </div>
+</div>
+<div th:fragment="myHeadHome" class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo"><a href="/fwzd/" style="color: #009688">FWZD首页</a></div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:">
+                    <span th:text="${session.sessionUsername}">admin</span>
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:openUploadLayer();">上传</a></dd>
+                    <dd><a href="/user_information/">基本资料</a></dd>
+                    <dd><a href="/userfwzd/">我的FWZD</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="/fwzd/logout">退出</a></li>
+        </ul>
+    </div>
+    <script>
+        layui.use('layer', function () {
+            var layer = layui.layer;
+
+        });
+        function openUploadLayer() {
+            layer.open({
+                type: 2,
+                title: '上传',
+                content: ['/upload_file/', 'no'],
+                area: ['360px', '300px'],
+                id: 'uploadFile',
+                end: function(){
+                    location.reload();
+                }
+            });
+        }
+
+    </script>
+</div>
+
+</body>
+
+</html>

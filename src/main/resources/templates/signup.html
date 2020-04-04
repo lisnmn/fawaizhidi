@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>注册FWZD</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mystyle.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.2.1.min.js}"></script>
+</head>
+<body class="layui-layout-body body-login">
+<div th:replace="head/common_heads :: myHeadSimple"></div>
+<div style="width:310px;margin: 100px auto 0;color: white;">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend><label>注册</label></legend>
+    </fieldset>
+    <form class="layui-form layui-form-pane" action="" style="color: black;opacity: 0.8;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" id="username" required lay-verify="required"
+                       placeholder="请输入用户名" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input type="text" name="password" id="password" required lay-verify="required"
+                       placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-inline">
+                <input type="text" name="confirmPassword" id="confirmPassword" required lay-verify="required"
+                       placeholder="请输入密码" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div style="width:300px;">
+            <blockquote class="layui-elem-quote">你看到了谁？</blockquote>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">答案</label>
+            <div class="layui-input-inline">
+                <input type="text" name="answer" id="answer" required lay-verify="required"
+                       placeholder="请输入答案" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formSignup">注册</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend><label>已有账号？</label></legend>
+    </fieldset>
+    <div class="layui-input-block" style="opacity: 0.8;">
+        <button class="layui-btn layui-btn-lg" id="btnSignup" onclick="javascript:location.href = '/login/';">立即登录
+        </button>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'element'], function () {
+        var element = layui.element;
+        var form = layui.form;
+        form.on('submit(formSignup)', function (data) {
+            if ($('#password').val() != $('#confirmPassword').val()) {
+                layer.msg("大哥你密码输对了🐎？", {icon: 3});
+                return false;
+            }
+            $.ajax({
+                url: "/signup/submit",
+                type: "POST",
+                data: data.field,
+                success: function (res) {
+                    if (res == "success") {
+                        layer.msg("注册成功！", {
+                            icon: 1,
+                            time: 1000
+                        }, function () {
+                            window.location.href = "/login/";
+                        });
+                    } else if (res == "failed") {
+                        layer.msg("用户已经存在！", {icon: 2});
+                    } else if (res == "answerFailed") {
+                        layer.msg("回答错误！您真的是越共🐎？", {icon: 3});
+                    }
+                },
+                error: function (e) {
+                    console.log("注册失败！失败信息：" + e);
+                    layer.msg("内部错误！", {icon: 2});
+                }
+            });
+            return false;
+        });
+    });
+
+
+</script>
+</body>
+</html>

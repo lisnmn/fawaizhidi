@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>主页</title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mystyle.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.2.1.min.js}"></script>
+</head>
+<body class="layui-layout-body body-homepage">
+<div th:replace="head/common_heads :: myHeadHome"></div>
+<div style="width:310px; margin: 100px auto 0;color: white;">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend><label>修改信息</label></legend>
+    </fieldset>
+    <form class="layui-form layui-form-pane" action="" style="color: black;opacity: 0.8;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-inline">
+                <input type="text" name="username" id="username" required lay-verify="required"
+                       placeholder="请输入用户名" autocomplete="off" class="layui-input" th:value="${user.getName()}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" id="password" required lay-verify="required"
+                       placeholder="请输入密码" autocomplete="off" class="layui-input" th:value="${user.getPassword()}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="confirmPassword" id="confirmPassword" required lay-verify="required"
+                       placeholder="请输入密码" autocomplete="off" class="layui-input" th:value="${user.getPassword()}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formUpdate">修改</button>
+            </div>
+        </div>
+    </form>
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend><label>已经，没有什么好怕的了</label></legend>
+    </fieldset>
+    <div class="layui-input-block" style="opacity: 0.8;">
+        <button class="layui-btn layui-btn-lg layui-btn-danger" id="btnSignup"
+                onclick="deleteUser()">删除账号
+        </button>
+    </div>
+</div>
+<script>
+    function deleteUser() {
+        layer.confirm('您确定?', {icon: 3, title:'提示'}, function(index) {
+            location.href = '/user_information/delete';
+            layer.close(index);
+        });
+    }
+
+    layui.use(['element', 'form'], function () {
+        var element = layui.element;
+        var form = layui.form;
+        form.on('submit(formUpdate)', function (data) {
+            if ($('#password').val() != $('#confirmPassword').val()) {
+                layer.msg("大哥你密码输对了🐎？", {icon: 3});
+                return false;
+            }
+            $.ajax({
+                url: "/user_information/submit",
+                type: "POST",
+                data: data.field,
+                success: function (res) {
+                    if (res == "success") {
+                        layer.msg("修改成功！", {
+                            icon: 1,
+                            time: 1000
+                        }, function () {
+                            location.reload();
+                        });
+                    } else if (res == "duplicated") {
+                        layer.msg("该名称已经存在！", {icon: 2});
+                    } else if (res == "SQLError") {
+                        layer.msg("您可能触碰到了亡魂！", {icon: 2});
+                    }
+                },
+                error: function (e) {
+                    console.log("修改失败！失败信息：" + e);
+                    layer.msg("内部错误！", {icon: 2});
+                }
+            });
+            return false;
+        })
+    });
+</script>
+</body>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title th:text="${image.name}"></title>
+    <link rel="stylesheet" th:href="@{/layui/css/layui.css}"/>
+    <link rel="stylesheet" th:href="@{/css/mystyle.css}">
+    <script type="text/javascript" th:src="@{/layui/layui.js}"></script>
+    <script type="text/javascript" th:src="@{/js/jquery-3.2.1.min.js}"></script>
+</head>
+<body class="body-homepage" style="overflow: auto;">
+<div th:replace="head/common_heads :: myHeadHome"></div>
+<div>
+    <div style="height:20px;"></div>
+    <div class="layui-container">
+        <div class="layui-row">
+            <div class="layui-col-md8 layui-col-md-offset2" style="background: white;">
+                <div th:id="'div-' + ${image.id}" class="placeholder">
+                    <div class="content">
+                        <img th:src="@{/image/upload/} + ${image.url}" class="img">
+                    </div>
+                </div>
+                <div class="layui-col-md8 layui-col-md-offset2">
+                    <div style="height:20px;"></div>
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" th:text="图像名"></label>
+                            <div class="layui-input-block">
+                                <input th:value="${image.name}" type="text" name="name" id="name" required
+                                       lay-verify="required" placeholder="" autocomplete="off" class="layui-input"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" th:text="上传者"></label>
+                            <div class="layui-input-block">
+                                <input th:value="${image.uploader}" type="text" name="uploader" id="uploader" required
+                                       lay-verify="required" placeholder="" autocomplete="off" class="layui-input"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" th:text="上传时间"></label>
+                            <div class="layui-input-block">
+                                <input th:value="${image.uploadTime}" type="text" name="uploadTime" id="uploadTime"
+                                       required
+                                       lay-verify="required" placeholder="" autocomplete="off" class="layui-input"
+                                       readonly>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label" th:text="分级"></label>
+                            <div class="layui-input-block">
+                                <input th:value="${image.rank}" type="text" name="rank" id="rank" required
+                                       lay-verify="required" placeholder="" autocomplete="off" class="layui-input"
+                                       readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div style="height:20px;"></div>
+            <div class="layui-col-md8 layui-col-md-offset2" style="background: white;">
+                <div class="layui-col-md8 layui-col-md-offset2">
+                    <form class="layui-form" action="">
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label" th:text="评论"></label>
+                            <div class="layui-input-block">
+                                <label for="comment"></label>
+                                <textarea id="comment" name="comment" placeholder="请输入内容" required
+                                          lay-verify="required" class="layui-textarea"></textarea>
+                                <button type="button" class="layui-btn layui-btn-primary" lay-submit
+                                        lay-filter="formComment">发送
+                                </button>
+                                <button type="reset" class="layui-btn layui-btn-danger">清空
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    <div th:each="comment:${commentList}">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <strong th:text="${comment.user}"></strong>
+                                <p th:text="${comment.comment}"></p>
+                                <p th:text="${comment.time}" style="color: gray"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card layui-col-md12 layui-col-lg12 layui-col-sm-12 layui-col-xs12"
+                         style="height: 70px;opacity: 0.9">
+                        <div class="layui-card-body" style="text-align: center;">
+                            <div id="page"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    layui.use(['form', 'element', 'laypage'], function () {
+        var element = layui.element;
+        var form = layui.form;
+        var laypage = layui.laypage;
+
+        var pageInst = laypage.render({
+            elem: 'page',   //指向存放分页的容器，值可以是容器ID、DOM对象。
+            count: [[${pageCount}]], //数据总数。一般通过服务端得到
+            limit: [[${limitCount}]],   //每页显示的条数。laypage将会借助 count 和 limit 计算出分页数。
+            curr: [[${currentPage}]],    //当前页。
+            groups: 3,  //连续出现的页码个数
+            layout: ['count', 'prev', 'page', 'next'],
+            jump: function (obj, first) {
+
+                if (!first) {
+                    console.log(obj);
+                    location.href = "/image/" + [[${image.id}]] + "/" + obj.curr + "/" + obj.limit + "/";
+                }
+            }
+        });
+        form.on('submit(formComment)', function (data) {
+            $.ajax({
+                url: "/image/" + [[${image.id}]] + "/comment",
+                type: "post",
+                data: data.field,
+                success: function (res) {
+                    if (res == "success") {
+                        layer.msg("评论成功！", {
+                            icon: 1,
+                            time: 1000,
+                        }, function () {
+                            location.reload();
+                        });
+                    } else if (res == "failed") {
+                        layer.msg("评论失败！", {icon: 2});
+                    }
+                },
+                error: function (e) {
+                    console.log("评论失败！失败信息：" + e);
+                    layer.msg("内部错误！", {icon: 2});
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
